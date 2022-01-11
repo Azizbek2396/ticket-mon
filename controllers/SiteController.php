@@ -154,9 +154,11 @@ class SiteController extends Controller
             }
             else{
                 $model->save();
+
             }
             
         }
+//        return $this->redirect('index');
         die;
     }
 

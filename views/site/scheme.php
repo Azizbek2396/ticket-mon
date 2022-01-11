@@ -4,33 +4,44 @@
 
 $this->title = 'Рассадка';
 ?>
+
 <div class="site-index">
-<div class="row">
-    <div class="col-lg-3">
-        <input type="text" name="zarep_name" id="zakreptext" class="form-control" oninput="zakrepTextInput()" placeholder="Введите комментарий..." />
+    <div class="row">
+        <div class="col-lg-3">
+            <input type="text" name="zarep_name" id="zakreptext" class="form-control" oninput="zakrepTextInput()" placeholder="Введите комментарий..." />
+        </div>
+        <div class="col-lg-2"><button id="zakrep" class="btn btn-primary disabled" disabled>Закрепить</button></div>
+        <div class="col-lg-2"><a href="?r=saver/index" class="btn btn-success">Редактировать</a></div>
+        <div class="col-lg-2"><a href="?r=site/scheme" class="btn btn-success">Обновить</a></div>
+        <div class="col-lg-2"><a href="?r=site/download" class="btn btn-success">Скачать EXCEL</a></div>
     </div>
-    <div class="col-lg-2"><button id="zakrep" class="btn btn-primary disabled" disabled>Закрепить</button></div>
-    <div class="col-lg-2"><a href="?r=saver/index" class="btn btn-success">Редактировать</a></div>
-    <div class="col-lg-2"><a href="?r=site/scheme" class="btn btn-success">Обновить</a></div>
-    <div class="col-lg-2"><a href="?r=site/download" class="btn btn-success">Скачать EXCEL</a></div>
-<!--    <div class="col-lg-1">-->
-<!--        <button id="masshtabplus" class="btn btn-primary">+</button>-->
-<!--        <button id="masshtabminus" class="btn btn-primary">-</button>-->
-<!--    </div>-->
-</div>
 
 
-<script src="https://code.jquery.com/ui/1.11.3/jquery-ui.js"></script>
-<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/overcast/jquery-ui.css" />
+    <script src="https://code.jquery.com/ui/1.11.3/jquery-ui.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/overcast/jquery-ui.css" />
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
-
+    <!--    Leaflet.js  -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
     <!-- Make sure you put this AFTER Leaflet's CSS -->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    <!--    Leaflet.js  -->
 
-<div id="map">
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>-->
+<!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>-->
 
-</div>
+<!--    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>-->
+
+    <div class="row">
+        <div class="col-4">
+
+        </div>
+        <div class="col-8">
+            <div id="map">
+            </div>
+        </div>
+    </div>
 
     <svg version="1.1" id="draggable" class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 16114 8019.1" style="display: none; enable-background:new 0 0 16114 8019.1;" xml:space="preserve">
     <style type="text/css">
@@ -270,7 +281,7 @@ $this->title = 'Рассадка';
         <g id="sm-main">
             <g id="Sector-E" data-sector="Sector-E">
                 <g data-sector="Sector-E" data-row="23">
-                    <g id="seat-1" data-sector="Sector-E" data-row="23" data-seat="70" data-toggle="tooltip" data-placement="top" data-html="true" title="Sector: Sector-E Row: 23 Seat: 70" data-original-title="Sector: Sector-E Row: 23 Seat: 70" class="seat" style="cursor: pointer;">
+                    <g id="seat-1" data-sector="Sector-E" data-row="23" data-seat="70" data-toggle="tooltip" data-placement="top" data-html="true" title=" <?= \app\models\Saver::find()->where(['seat_id' => 'seat-1'])->one()->comment ?>  - Sector: Sector-E Row: 23 Seat: 70" data-original-title="Sector: Sector-E Row: 23 Seat: 70" class="seat" style="cursor: pointer;">
                         <circle id="Circle_2083_" class="st6" cx="2757" cy="2576.6" r="51.9"></circle>
                         <path class="st7" d="M2829.5,2588.2l-84.2,61l-61-84.2l84.2-61L2829.5,2588.2z"></path>
                         <text transform="matrix(0.8099 -0.5865 0.5865 0.8099 2747.8474 2602.4414)" class="st8 st9 st10">70</text>
@@ -9507,40 +9518,36 @@ $this->title = 'Рассадка';
             </g>
         </g>
 </svg>
-
-    <!--<div id="schemeid">-->
-<!---->
-<!--</div>       -->
-
 </div>
 
 
-
-
-
 <?php
-    $zakrep_arr = 'var zakr_arr = {};';
-    $accessable_count = 0;
-    foreach ($models as $key) {
-        $colorclass = substr(hash('ripemd160', $key->comment), -6);
-        $zakrep_arr .= 'zakr_arr[\''.$key->seat_id.'\']=\''.$colorclass.'\';';
-        
+$zakrep_arr = 'var zakr_arr = {};';
+$accessable_count = 0;
+foreach ($models as $key) {
+    $colorclass = substr(hash('ripemd160', $key->comment), -6);
+    $zakrep_arr .= 'zakr_arr[\''.$key->seat_id.'\']=\''.$colorclass.'\';';
 
-        echo '
+    echo `
                 <div id="'.$key->seat_id.'comment" class="alert alert-success alert-dismissible dispnone seatcomment">
                   '.$key->comment.' - '.$key->place_title.'
                 </div>
-        ';
-        if($key->comment=='Свободные места'){
-            $accessable_count++;
-        }
+        `;
+    if($key->comment=='Свободные места'){
+        $accessable_count++;
     }
-    $zakrep_arr .= '';
+}
+$zakrep_arr .= '';
 ?>
 
 <div id="accessable_places"><span id='accessable_color_span'></span> Свободные места: <span id='accessable_count'><?=$accessable_count?></span></div>
 
+
     <script type="text/javascript">
+
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
 
         const svg = document.querySelector('#draggable');
         const copySvg = svg;
@@ -9558,7 +9565,7 @@ $this->title = 'Рассадка';
             zoomDelta: 0.5,
             zoomSnap: 0.5,
             maxBoundsViscosity: 1,
-            attributionControl: false
+            attributionControl: false,
         });
 
         const imageBounds = [
@@ -9567,6 +9574,26 @@ $this->title = 'Рассадка';
         ];
 
         const svgOverlay = L.svgOverlay(copySvg, imageBounds, {name: "scheme", interactive: true}).addTo(map);
+
+        // var popup = L.popup();
+        // function onMapClick(e) {
+        //     popup
+        //         .setLatLng(e.latlng)
+        //         .setContent("You clicked the map at " + e.latlng.toString())
+        //         .openOn(map);
+        // }
+
+        // map.on('click', onMapClick);
+
+        function(feature,layer){
+            layer.on('mouseover mousemove', function(e){
+                var hover_bubble = new L.Rrose({ offset: new L.Point(0,-10), closeButton: false, autoPan: false })
+                    .setContent(feature.properties.name)
+                    .setLatLng(e.latlng)
+                    .openOn(rrose_map);
+            });
+            layer.on('mouseout', function(e){ rrose_map.closePopup() });
+        }
 
         $("#draggable").draggable();
         var color = Math.floor(Math.random() * 16777216).toString(16);
@@ -9582,10 +9609,19 @@ $this->title = 'Рассадка';
         $( "g g g g" ).click(function() {
           if($(this).hasClass('active')){
             $(this).removeClass('active');
+              popup
+                  .setLatLng($(this).latlng)
+                  .setContent("You clicked the map at " + $(this).latlng.toString())
+                  //.setContent()
+                  .openOn(map);
           }
           else{
             if(!$(this).hasClass('zakrep')){
                 $(this).addClass('active');
+                popup
+                    .setLatLng($(this).latlng)
+                    .setContent("You clicked the map at " + $(this).latlng.toString())
+                    .openOn(map);
             }
           }
         });
@@ -9634,18 +9670,6 @@ $this->title = 'Рассадка';
                 $('#zakrep').prop("disabled", true);
             }
         }
-
-        // $( "#masshtabplus" ).click(function() {
-        //     $('#draggable').css('width', '180%');
-        //     $('#draggable').css('transform', 'translate3d(-400px, 0px, 0px)');
-        // });
-        //
-        //
-        // $( "#masshtabminus" ).click(function() {
-        //     $('#draggable').css('width', '100%');
-        //     $('#draggable').css('transform', 'translate3d(0px, 0px, 0px)');
-        // });
-
         function toHexString(n) {
             if(n < 0) {
                 n = 0xFFFFFFFF + n + 1;
@@ -9659,7 +9683,7 @@ $this->title = 'Рассадка';
         #map {
             width: 100%;
             height: 80vh;
-            margin-top: 100px;
+            margin-top: 40px;
             margin-left: auto;
             margin-right: auto;
         }
