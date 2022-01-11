@@ -158,7 +158,7 @@ class SiteController extends Controller
             }
             
         }
-//        return $this->redirect('index');
+        return $this->redirect('index');
         die;
     }
 
