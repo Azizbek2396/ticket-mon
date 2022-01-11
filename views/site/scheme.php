@@ -26,23 +26,16 @@ $this->title = 'Рассадка';
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
     <!--    Leaflet.js  -->
 
-<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">-->
-<!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>-->
-<!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>-->
-
-<!--    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>-->
-<!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>-->
-
     <div class="row">
-        <div class="col-4">
-
-        </div>
-        <div class="col-8">
+<!--        <div class="col-4">-->
+<!---->
+<!--        </div>-->
+        <div class="col-12">
             <div id="map">
             </div>
         </div>
     </div>
-
+<!--    --><?php //\app\models\Saver::find()->where(['seat_id' => 'seat-1'])->one()->comment ?><!-- -->
     <svg version="1.1" id="draggable" class="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 16114 8019.1" style="display: none; enable-background:new 0 0 16114 8019.1;" xml:space="preserve">
     <style type="text/css">
         .st0{clip-path:url(#SVGID_2_);fill:#BE1622;}
@@ -281,7 +274,7 @@ $this->title = 'Рассадка';
         <g id="sm-main">
             <g id="Sector-E" data-sector="Sector-E">
                 <g data-sector="Sector-E" data-row="23">
-                    <g id="seat-1" data-sector="Sector-E" data-row="23" data-seat="70" data-toggle="tooltip" data-placement="top" data-html="true" title=" <?= \app\models\Saver::find()->where(['seat_id' => 'seat-1'])->one()->comment ?>  - Sector: Sector-E Row: 23 Seat: 70" data-original-title="Sector: Sector-E Row: 23 Seat: 70" class="seat" style="cursor: pointer;">
+                    <g id="seat-1" data-sector="Sector-E" data-row="23" data-seat="70" data-toggle="tooltip" data-placement="top" data-html="true" title="Sector: Sector-E Row: 23 Seat: 70" data-original-title="Sector: Sector-E Row: 23 Seat: 70" class="seat" style="cursor: pointer;">
                         <circle id="Circle_2083_" class="st6" cx="2757" cy="2576.6" r="51.9"></circle>
                         <path class="st7" d="M2829.5,2588.2l-84.2,61l-61-84.2l84.2-61L2829.5,2588.2z"></path>
                         <text transform="matrix(0.8099 -0.5865 0.5865 0.8099 2747.8474 2602.4414)" class="st8 st9 st10">70</text>
@@ -9528,11 +9521,13 @@ foreach ($models as $key) {
     $colorclass = substr(hash('ripemd160', $key->comment), -6);
     $zakrep_arr .= 'zakr_arr[\''.$key->seat_id.'\']=\''.$colorclass.'\';';
 
+//    var_dump($key);die();
     echo `
                 <div id="'.$key->seat_id.'comment" class="alert alert-success alert-dismissible dispnone seatcomment">
                   '.$key->comment.' - '.$key->place_title.'
                 </div>
         `;
+    
     if($key->comment=='Свободные места'){
         $accessable_count++;
     }
@@ -9540,14 +9535,16 @@ foreach ($models as $key) {
 $zakrep_arr .= '';
 ?>
 
+<?php foreach ($models as $key):  ?>
+    <div id="<?=$key->seat_id?>comment" class="alert alert-success alert-dismissible dispnone seatcomment">
+        <strong><?=$key->comment?></strong> <br> <?=$key->place_title?>
+    </div>
+<?php endforeach; ?>
+
 <div id="accessable_places"><span id='accessable_color_span'></span> Свободные места: <span id='accessable_count'><?=$accessable_count?></span></div>
 
 
     <script type="text/javascript">
-
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
-        })
 
         const svg = document.querySelector('#draggable');
         const copySvg = svg;
@@ -9575,25 +9572,23 @@ $zakrep_arr .= '';
 
         const svgOverlay = L.svgOverlay(copySvg, imageBounds, {name: "scheme", interactive: true}).addTo(map);
 
-        // var popup = L.popup();
-        // function onMapClick(e) {
-        //     popup
-        //         .setLatLng(e.latlng)
-        //         .setContent("You clicked the map at " + e.latlng.toString())
-        //         .openOn(map);
-        // }
-
-        // map.on('click', onMapClick);
-
-        function(feature,layer){
-            layer.on('mouseover mousemove', function(e){
-                var hover_bubble = new L.Rrose({ offset: new L.Point(0,-10), closeButton: false, autoPan: false })
-                    .setContent(feature.properties.name)
+        var popup = L.popup();
+        function onMapClick(e) {
+            // console.log(e.originalEvent.path[1].dataset.originalTitle);
+            var seat = '#' + e.originalEvent.path[1].id + "comment";
+            // console.log(seat);
+            // console.log(document.querySelector(seat).innerHTML);
+            if (document.querySelector(seat).innerHTML){
+                popup
                     .setLatLng(e.latlng)
-                    .openOn(rrose_map);
-            });
-            layer.on('mouseout', function(e){ rrose_map.closePopup() });
+                    .setContent(document.querySelector(seat).innerHTML)
+                    .openOn(map)
+                    .className("asb");
+            }
+
         }
+
+        map.on('click', onMapClick);
 
         $("#draggable").draggable();
         var color = Math.floor(Math.random() * 16777216).toString(16);
@@ -9609,19 +9604,10 @@ $zakrep_arr .= '';
         $( "g g g g" ).click(function() {
           if($(this).hasClass('active')){
             $(this).removeClass('active');
-              popup
-                  .setLatLng($(this).latlng)
-                  .setContent("You clicked the map at " + $(this).latlng.toString())
-                  //.setContent()
-                  .openOn(map);
           }
           else{
             if(!$(this).hasClass('zakrep')){
                 $(this).addClass('active');
-                popup
-                    .setLatLng($(this).latlng)
-                    .setContent("You clicked the map at " + $(this).latlng.toString())
-                    .openOn(map);
             }
           }
         });
@@ -9683,9 +9669,15 @@ $zakrep_arr .= '';
         #map {
             width: 100%;
             height: 80vh;
-            margin-top: 40px;
+            margin-top: 140px;
             margin-left: auto;
             margin-right: auto;
+        }
+
+        .leaflet-popup-content {
+            font-size: 20px;
+            text-align: center;
+            min-width: 320px
         }
 
         /*body > div.wrap > div.container{*/
@@ -9715,7 +9707,6 @@ $zakrep_arr .= '';
         .active text{
             fill: black;
         }
-
 
         .zakrep path{
             fill: #7656FD;
