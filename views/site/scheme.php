@@ -9522,11 +9522,11 @@ foreach ($models as $key) {
     $zakrep_arr .= 'zakr_arr[\''.$key->seat_id.'\']=\''.$colorclass.'\';';
 
 //    var_dump($key);die();
-    echo `
-                <div id="'.$key->seat_id.'comment" class="alert alert-success alert-dismissible dispnone seatcomment">
-                  '.$key->comment.' - '.$key->place_title.'
-                </div>
-        `;
+//    echo `
+//                <div id="'.$key->seat_id.'comment" class="alert alert-success alert-dismissible dispnone seatcomment">
+//                  '.$key->comment.' - '.$key->place_title.'
+//                </div>
+//        `;
     
     if($key->comment=='Свободные места'){
         $accessable_count++;
@@ -9669,7 +9669,7 @@ $zakrep_arr .= '';
         #map {
             width: 100%;
             height: 80vh;
-            margin-top: 140px;
+            margin-top: 100px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -9680,27 +9680,6 @@ $zakrep_arr .= '';
             min-width: 320px
         }
 
-        /*body > div.wrap > div.container{*/
-        /*    width: 100%;*/
-        /*}*/
-        /*.wrap > .container {*/
-        /*    padding: 10px 15px 20px;*/
-        /*}*/
-        /*nav{*/
-        /*    display: none;*/
-        /*}*/
-        /*#schemeid{*/
-        /*    width: 100%;*/
-        /*    height: 50%;*/
-        /*    overflow: scroll;*/
-        /*    margin-top: 30px;*/
-        /*    text-align: center;*/
-        /*}*/
-        /*#schemeid svg{*/
-        /*    width: 100%;*/
-        /*    transform: translate3d(0px, 0px, 0px);*/
-
-        /*}*/
         .active path{
             fill: yellow;
         }
