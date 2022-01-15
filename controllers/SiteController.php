@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
@@ -131,12 +132,32 @@ class SiteController extends Controller
     }
 
 
-    public function actionScheme()
+    public function actionScheme($id="1")
     {
+        $path = dirname(__DIR__, 1). "/web/svg/".$id.".svg";
+        if(!file_exists($path)) {
+            throw new NotFoundHttpException("File not found!");
+        }
 
-        $models = Saver::find()->where(['event_id'=>$this::EVENTID])->all();
+//        $models = Saver::find()->where(['event_id'=>$this::EVENTID])->all();
 
         return $this->render('scheme', [
+//            'models'    => $models,
+            'path'      => $path,
+        ]);
+    }
+
+
+
+
+    public function actionTest()
+    {
+        $this->layout = "a";
+        $models = Saver::find()->where(['event_id'=>$this::EVENTID])->all();
+
+
+
+        return $this->render('test', [
             'models' => $models,
         ]);
     }
@@ -144,6 +165,7 @@ class SiteController extends Controller
     public function actionSaver()
     {
         foreach (Yii::$app->request->post('seats') as $key => $value) {
+//            var_dump($value);die();
             $model = new Saver();
             $model->event_id = $this::EVENTID;
             $model->seat_id = $value['seatid'];
@@ -158,7 +180,7 @@ class SiteController extends Controller
             }
             
         }
-//        return $this->redirect('index');
+        return $this->redirect('index');
         die;
     }
 
