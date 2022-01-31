@@ -64,7 +64,7 @@ $this->title = 'Рассадка';
 
         function init() {
             $("g.zakrep").hover(
-                function(e) {
+                function() {
                     const text = this.getAttribute("data-original-title");
                     $("#seat-alert").html(text);
                     $("#seat-alert").removeClass('dispnone');

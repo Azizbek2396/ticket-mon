@@ -32,14 +32,26 @@ class SeatController extends Controller
 
 //        $counts = [];
 //        $seatCount = 0;
-//        $comment = $zakrep_arr[0]['comment'];
-//
+//        $comment = array_values($zakrep_arr)[0]["comment"];
+//        $color = array_values($zakrep_arr)[0]["color"];
+//        $counts[0] = [
+//            'count' => $seatCount,
+//            'comment' => $comment,
+//            'color' => $color
+//        ];
+//        var_dump($counts);die();
+//        var_dump(array_values($zakrep_arr)[0]["comment"]);die();
+
 //        foreach ($zakrep_arr as $seat) {
-//            if ($seat)
+//            if ($seat->comment == $comment) {
+//                $seatCount++;
+//            } else {
+//                $comment
+//            }
 //        }
 
         return [
-            'count' => $accessable_count,
+//            'count' => $accessable_count,
             'seats'  => $zakrep_arr,
         ];
     }
