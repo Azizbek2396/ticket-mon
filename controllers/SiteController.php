@@ -17,7 +17,7 @@ class SiteController extends Controller
     /**
      * {@inheritdoc}
      */
-    public const EVENTID = 2;
+    public const EVENTID = 4;
     public function behaviors()
     {
         return [
@@ -132,7 +132,7 @@ class SiteController extends Controller
     }
 
 
-    public function actionScheme($id="1")
+    public function actionScheme($id="2")
     {
         $path = dirname(__DIR__, 1). "/web/svg/".$id.".svg";
         if(!file_exists($path)) {
@@ -171,6 +171,8 @@ class SiteController extends Controller
             $model->seat_id = $value['seatid'];
             $model->place_title = $value['title'];
             $model->comment = Yii::$app->request->post('comment');
+//            var_dump(Yii::$app->request->post('comment'));die();
+            $model->color = substr(hash('ripemd160', Yii::$app->request->post('comment')), -6);
             if(Saver::find()->where(['event_id'=>$model->event_id,'seat_id'=>$model->seat_id])->one()){
                 $a = 1;
             }

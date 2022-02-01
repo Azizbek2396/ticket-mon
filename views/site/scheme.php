@@ -65,7 +65,7 @@ $this->title = 'Рассадка';
         function init() {
             $("g.zakrep").hover(
                 function() {
-                    const text = this.getAttribute("data-original-title");
+                    const text = this.getAttribute("title");
                     $("#seat-alert").html(text);
                     $("#seat-alert").removeClass('dispnone');
                     $("#seat-alert").addClass('dispblock');
@@ -84,7 +84,7 @@ $this->title = 'Рассадка';
             $.each(data.seats,function(index,value) {
                 $('#'+index)
                     .addClass('zakrep')
-                    .attr("data-original-title", "<span class='rectangle'></span>" + "<strong>" + value.comment + "</strong>" + " - " + value.place_title);
+                    .attr("title", "<span class='rectangle'></span>" + "<strong>" + value.comment + "</strong>" + " - " + value.place_title);
                 $('#'+index+' path').css('fill', '#'+value.color);
             });
             init();
@@ -143,7 +143,7 @@ $this->title = 'Рассадка';
                $(obj).addClass('zakrep');
                seats[i] = {};
                seats[i]['seatid'] = $(obj).attr('id');
-               seats[i]['title'] = $(obj).attr('title');
+               seats[i]['title'] = $(obj).attr('data-original-title');
            });
            comment = $('#zakreptext').val();
            $.post('?r=site/saver', {seats: seats, comment: comment}, function(data){});

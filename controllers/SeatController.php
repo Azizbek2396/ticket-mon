@@ -16,7 +16,7 @@ class SeatController extends Controller
 
     public function actionIndex()
     {
-        $models = Saver::find()->where(['event_id'=> 3])->all();
+        $models = Saver::find()->where(['event_id'=> 4])->all();
 
         $zakrep_arr = [];
         $accessable_count = 0;
@@ -30,29 +30,35 @@ class SeatController extends Controller
 
         }
 
-//        $counts = [];
-//        $seatCount = 0;
-//        $comment = array_values($zakrep_arr)[0]["comment"];
-//        $color = array_values($zakrep_arr)[0]["color"];
-//        $counts[0] = [
-//            'count' => $seatCount,
-//            'comment' => $comment,
-//            'color' => $color
-//        ];
-//        var_dump($counts);die();
-//        var_dump(array_values($zakrep_arr)[0]["comment"]);die();
+        $counts = [];
+        $seatCount = 0;
 
-//        foreach ($zakrep_arr as $seat) {
-//            if ($seat->comment == $comment) {
-//                $seatCount++;
-//            } else {
-//                $comment
-//            }
-//        }
+        $comments = [];
+
+        foreach ($zakrep_arr as $seat) {
+            if (!in_array($seat['comment'], $comments)) {
+                array_push($comments, $seat['comment']);
+            }
+        }
+
+        foreach ($comments as $comment) {
+            foreach ($zakrep_arr as $seat){
+                if ($seat['comment'] === $comment) {
+                    $seatCount++;
+                    $color = $seat['color'];
+                }
+            }
+                array_push($counts,[
+                    'count' => $seatCount,
+                    'comment' => $comment,
+                    'color' => $color
+                ]);
+                $seatCount  = 0;
+        }
 
         return [
-//            'count' => $accessable_count,
             'seats'  => $zakrep_arr,
+            'counts' => $counts
         ];
     }
 

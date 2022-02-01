@@ -37,6 +37,10 @@ class SaverController extends Controller
     {
         $searchModel = new SaverSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->query->andWhere(["event_id" => 4]);
+//        $dataProvider->setSort([
+//            'defaultOrder' => ['id' => SORT_ASC]
+//        ]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
