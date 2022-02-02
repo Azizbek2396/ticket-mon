@@ -103,6 +103,24 @@ $this->title = 'Рассадка';
                     $("#seat-alert").addClass('dispnone');
                 }
             );
+
+            $("g.zakrep").click(
+                function() {
+                    const text = this.getAttribute("title");
+                    console.log(text);
+                    $("#seat-alert").html(text);
+                    $("#seat-alert").removeClass('dispnone');
+                    $("#seat-alert").addClass('dispblock');
+                    $("#seat-alert").css('top', $(this).offset().top-30)
+                    $("#seat-alert").css('left', $(this).offset().left+40)
+                    // console.log($(this).offset());
+                },
+                // function() {
+                //     $("#seat-alert").html("");
+                //     $("#seat-alert").removeClass('dispblock');
+                //     $("#seat-alert").addClass('dispnone');
+                // }
+            )
         }
 
         const seatCallback = function (data) {
