@@ -3,16 +3,16 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Saver;
-use app\models\SaverSearch;
+use app\models\Events;
+use app\models\EventwsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * SaverController implements the CRUD actions for Saver model.
+ * EventsController implements the CRUD actions for Events model.
  */
-class SaverController extends Controller
+class EventsController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -30,17 +30,13 @@ class SaverController extends Controller
     }
 
     /**
-     * Lists all Saver models.
+     * Lists all Events models.
      * @return mixed
      */
-    public function actionIndex($id)
+    public function actionIndex()
     {
-        $searchModel = new SaverSearch();
+        $searchModel = new EventwsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider->query->andWhere(["event_id" => $id]);
-//        $dataProvider->setSort([
-//            'defaultOrder' => ['id' => SORT_ASC]
-//        ]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -49,7 +45,7 @@ class SaverController extends Controller
     }
 
     /**
-     * Displays a single Saver model.
+     * Displays a single Events model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -62,13 +58,13 @@ class SaverController extends Controller
     }
 
     /**
-     * Creates a new Saver model.
+     * Creates a new Events model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Saver();
+        $model = new Events();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -80,7 +76,7 @@ class SaverController extends Controller
     }
 
     /**
-     * Updates an existing Saver model.
+     * Updates an existing Events model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -100,7 +96,7 @@ class SaverController extends Controller
     }
 
     /**
-     * Deletes an existing Saver model.
+     * Deletes an existing Events model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -114,18 +110,18 @@ class SaverController extends Controller
     }
 
     /**
-     * Finds the Saver model based on its primary key value.
+     * Finds the Events model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Saver the loaded model
+     * @return Events the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Saver::findOne($id)) !== null) {
+        if (($model = Events::findOne($id)) !== null) {
             return $model;
         }
 
-        throw new NotFoundHttpException(Yii::t('custom', 'The requested page does not exist.'));
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

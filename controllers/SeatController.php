@@ -14,9 +14,9 @@ class SeatController extends Controller
         return $parent;
     }
 
-    public function actionIndex()
+    public function actionIndex($id)
     {
-        $models = Saver::find()->where(['event_id'=> 4])->all();
+        $models = Saver::find()->where(['event_id'=> $id])->all();
 
         $zakrep_arr = [];
         $accessable_count = 0;

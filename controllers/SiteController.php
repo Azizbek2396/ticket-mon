@@ -2,8 +2,10 @@
 
 namespace app\controllers;
 
+use app\models\Events;
 use Yii;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -131,19 +133,29 @@ class SiteController extends Controller
         return $this->render('about');
     }
 
-
-    public function actionScheme($id="2")
+    public function actionScheme($id="last")
     {
-        $path = dirname(__DIR__, 1). "/web/svg/".$id.".svg";
+        if ($id === "last") {
+            $id = Events::find()->orderBy(['id' => SORT_DESC])->one()->id;
+        }
+        if($this->request->post('id')){
+            $id = $this->request->post('id');
+        }
+        $event = Events::findOne($id);
+
+        $path = dirname(__DIR__, 1). "/web/svg/".$event->hall.".svg";
         if(!file_exists($path)) {
             throw new NotFoundHttpException("File not found!");
         }
+        $events = ArrayHelper::map(Events::find()->all(), 'id', 'title');
 
 //        $models = Saver::find()->where(['event_id'=>$this::EVENTID])->all();
 
         return $this->render('scheme', [
 //            'models'    => $models,
+            'id' => $id,
             'path'      => $path,
+            'events'    => $events
         ]);
     }
 
@@ -162,12 +174,12 @@ class SiteController extends Controller
         ]);
     }
 
-    public function actionSaver()
+    public function actionSaver($id)
     {
         foreach (Yii::$app->request->post('seats') as $key => $value) {
 //            var_dump($value);die();
             $model = new Saver();
-            $model->event_id = $this::EVENTID;
+            $model->event_id = $id;
             $model->seat_id = $value['seatid'];
             $model->place_title = $value['title'];
             $model->comment = Yii::$app->request->post('comment');
@@ -182,11 +194,11 @@ class SiteController extends Controller
             }
             
         }
-        return $this->redirect('index');
+        return $this->redirect(['scheme', 'id'=>$id] );
         die;
     }
 
-    public function actionDownload()
+    public function actionDownload($id)
     {
         ini_set('memory_limit', '512M');
         set_time_limit(20 * 60);
@@ -202,7 +214,7 @@ class SiteController extends Controller
         $activeSheet = $objPHPExcel->getActiveSheet();
 
         $row = 2;
-        $models = Saver::find()->where(['event_id'=>$this::EVENTID])->all();
+        $models = Saver::find()->where(['event_id'=>$id])->all();
 
         $models = Saver::find()
             ->select(['COUNT(*) AS cnt', 'comment'])

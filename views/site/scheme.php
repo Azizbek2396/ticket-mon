@@ -1,22 +1,47 @@
 <?php
 
 /* @var $this yii\web\View */
-
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
 $this->title = 'Рассадка';
+
 ?>
 
 <div class="site-index">
-    <div class="row" style="margin-bottom: 50px;">
-        <div class="col-lg-3">
+    <div class="row" style="margin-bottom: 20px;">
+        <div class="col-lg-4">
             <input type="text" name="zarep_name" id="zakreptext" class="form-control" oninput="zakrepTextInput()" placeholder="Введите комментарий..." />
         </div>
         <div class="col-lg-2"><button id="zakrep" class="btn btn-primary disabled" disabled>Закрепить</button></div>
-        <div class="col-lg-2"><a href="<?= \yii\helpers\Url::toRoute(["saver/index"])?>" class="btn btn-success">Редактировать</a></div>
+        <div class="col-lg-2"><a href="<?= \yii\helpers\Url::toRoute(["saver/index",'id'=>$id])?>" class="btn btn-success">Редактировать</a></div>
         <div class="col-lg-2"><a href="?r=site/scheme" class="btn btn-success">Обновить</a></div>
-        <div class="col-lg-2"><a href="?r=site/download" class="btn btn-success">Скачать EXCEL</a></div>
+        <div class="col-lg-2"><a href="?r=site/download&id=<?=$id?>" class="btn btn-success">Скачать EXCEL</a></div>
     </div>
+    <?php $form = ActiveForm::begin([
+        'action' => ['site/scheme'],
+        'method' => 'post',
+    ]); ?>
+        <div class="row" style="margin-bottom: 50px;">
 
-    <div id="accessable_places"><span id='accessable_color_span'></span> Свободные места: <span id='accessable_count'></span></div>
+            <div class="col-lg-4"><?=Html::dropDownList('id', $id, $events, ['class'=>'form-control'])?></div>
+            <div class="col-lg-4"><?= Html::submitButton('Перейти', ['class' => 'btn btn-primary']) ?></div>
+
+        </div>
+    <?php ActiveForm::end(); ?>
+
+<!--    <div id="accessable_places"><span id='accessable_color_span'></span> Свободные места: <span id='accessable_count'></span></div>-->
+    <div class="row">
+        <div class="col-12">
+            <ul class="comments">
+<!--                <li class="comment_item"><span class="comment_color"></span><h4 class="comment">GABT</h4> : <p>23</p></li>-->
+<!--                <li class="comment_item"><span class="comment_color"></span><h4 class="comment">GABT</h4> : <p>23</p></li>-->
+<!--                <li class="comment_item"><span class="comment_color"></span><h4 class="comment">GABT</h4> : <p>23</p></li>-->
+<!--                <li class="comment_item"><span class="comment_color"></span><h4 class="comment">GABT</h4> : <p>23</p></li>-->
+<!--                <li class="comment_item"><span class="comment_color"></span><h4 class="comment">GABT</h4> : <p>23</p></li>-->
+<!--                <li class="comment_item"><span class="comment_color"></span><h4 class="comment">GABT</h4> : <p>23</p></li>-->
+            </ul>
+        </div>
+    </div>
 
     <script src="https://code.jquery.com/ui/1.11.3/jquery-ui.js"></script>
     <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/overcast/jquery-ui.css" />
@@ -87,10 +112,18 @@ $this->title = 'Рассадка';
                     .attr("title", "<span class='rectangle'></span>" + "<strong>" + value.comment + "</strong>" + " - " + value.place_title);
                 $('#'+index+' path').css('fill', '#'+value.color);
             });
+
+            $.each(data.counts, function(index,value) {
+                // console.log(index);
+                $('.comments')
+                    .append('<li class="comment_item"><span class="comment_color" style="background-color: #' + value.color + '"></span><h4 class="comment">'+ value.comment + '</h4> : <p>' + value.count +' </p></li>');
+                // $('.comment_color')
+                //     .css('background-color', '#' + value.color);
+            });
             init();
         };
 
-        const url = window.location.origin + "/index.php?r=seat/index";
+        const url = window.location.origin + "/index.php?r=seat/index&id=<?=$id?>";
 
         fetch(url)
             .then(response => response.json())
@@ -146,7 +179,7 @@ $this->title = 'Рассадка';
                seats[i]['title'] = $(obj).attr('data-original-title');
            });
            comment = $('#zakreptext').val();
-           $.post('?r=site/saver', {seats: seats, comment: comment}, function(data){});
+           $.post('?r=site/saver&id=<?=$id?>', {seats: seats, comment: comment}, function(data){});
         });
 
         function zakrepTextInput(){
@@ -245,17 +278,40 @@ $this->title = 'Рассадка';
             border-color: transparent #dff0d8 transparent transparent;
         }
 
-
-        }
         /*#accessable_places{*/
         /*    position: absolute;*/
         /*    top: 140px;*/
         /*}*/
 
-        /*#accessable_color_span{*/
-        /*    background-color: rgb(217, 171, 10);*/
-        /*    width: 10px;*/
-        /*    height: 10px;*/
-        /*    display: inline-block;*/
-        /*}*/
+        .comments {
+            padding: 0;
+            height: 100px;
+            overflow: auto;
+            margin-bottom: 20px;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .comments > li {
+            list-style-type: none;
+        }
+        .comment_item {
+            display: flex;
+        }
+
+        .comment_item p,
+        .comment_item h4 {
+            margin: 0;
+        }
+
+        .comment_item p {
+            margin-left: 8px;
+        }
+        .comment_color {
+            /*background-color: rgb(217, 171, 10);*/
+            width: 10px;
+            height: 10px;
+            display: inline-block;
+            margin-right: 8px;
+            margin-top: 5px;
+        }
     </style>
