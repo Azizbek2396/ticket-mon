@@ -107,7 +107,7 @@ $this->title = 'Рассадка';
             $("g.zakrep").click(
                 function() {
                     const text = this.getAttribute("title");
-                    console.log(text);
+                    // console.log(text);
                     $("#seat-alert").html(text);
                     $("#seat-alert").removeClass('dispnone');
                     $("#seat-alert").addClass('dispblock');

@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model app\models\Saver */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('custom', 'List'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('custom', 'List'), 'url' => ['index', 'id' => $model->event_id]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>

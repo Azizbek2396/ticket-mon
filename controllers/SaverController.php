@@ -33,8 +33,11 @@ class SaverController extends Controller
      * Lists all Saver models.
      * @return mixed
      */
+    public $event_id;
+
     public function actionIndex($id)
     {
+        $this->event_id = $id;
         $searchModel = new SaverSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->query->andWhere(["event_id" => $id]);
@@ -108,9 +111,10 @@ class SaverController extends Controller
      */
     public function actionDelete($id)
     {
+        $event_id = $this->findModel($id)->event_id;
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index', 'id' => $event_id]);
     }
 
     /**

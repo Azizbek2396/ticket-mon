@@ -218,7 +218,7 @@ class SiteController extends Controller
 
         $models = Saver::find()
             ->select(['COUNT(*) AS cnt', 'comment'])
-            ->where(['event_id'=>$this::EVENTID])
+            ->where(['event_id'=>$id])
             ->groupBy(['comment'])
             ->all();
         $amount = 0;
@@ -228,7 +228,7 @@ class SiteController extends Controller
             $activeSheet->setCellValueExplicit('C'.$row, $key->cnt, \PHPExcel_Cell_DataType::TYPE_NUMERIC);
 
             $places = Saver::find()
-            ->where(['event_id'=>$this::EVENTID,'comment'=>$key->comment])
+            ->where(['event_id'=>$id,'comment'=>$key->comment])
             ->all();
             $string = '';
             foreach ($places as $place) {
