@@ -32,6 +32,7 @@ class SeatController extends Controller
 
         $counts = [];
         $seatCount = 0;
+        $allCount = 0;
 
         $comments = [];
 
@@ -48,17 +49,19 @@ class SeatController extends Controller
                     $color = $seat['color'];
                 }
             }
-                array_push($counts,[
-                    'count' => $seatCount,
-                    'comment' => $comment,
-                    'color' => $color
-                ]);
-                $seatCount  = 0;
+            array_push($counts,[
+                'count' => $seatCount,
+                'comment' => $comment,
+                'color' => $color
+            ]);
+            $allCount += $seatCount;
+            $seatCount  = 0;
         }
 
         return [
             'seats'  => $zakrep_arr,
-            'counts' => $counts
+            'counts' => $counts,
+            'allCount' => $allCount
         ];
     }
 
