@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\EventwsSearch */
+/* @var $searchModel app\models\EventsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Events';
@@ -29,7 +29,9 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'title:ntext',
             'hall:ntext',
+            'session_id:ntext',
             'date',
+            'is_active',
             [
                 'label' => 'Перейти',
                 'format' => 'raw',

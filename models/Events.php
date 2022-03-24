@@ -29,7 +29,8 @@ class Events extends \yii\db\ActiveRecord
     {
         return [
             [['title', 'hall', 'date'], 'required'],
-            [['title', 'hall'], 'string'],
+            [['title'], 'string'],
+            [['session_id', 'hall', 'is_active'], 'integer'],
             [['date'], 'safe'],
         ];
     }
@@ -43,7 +44,9 @@ class Events extends \yii\db\ActiveRecord
             'id' => 'ID',
             'title' => 'Title',
             'hall' => 'Hall',
+            'session_id' => 'Sesion ID',
             'date' => 'Date',
+            'is_active' => 'Is Active'
         ];
     }
 }

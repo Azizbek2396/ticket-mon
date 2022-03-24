@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\EventwsSearch */
+/* @var $model app\models\EventsSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -20,6 +20,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'title') ?>
 
     <?= $form->field($model, 'hall') ?>
+
+    <?= $form->field($model, 'session_id') ?>
 
     <?= $form->field($model, 'date') ?>
 

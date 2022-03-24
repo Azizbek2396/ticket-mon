@@ -7,9 +7,9 @@ use yii\data\ActiveDataProvider;
 use app\models\Events;
 
 /**
- * EventwsSearch represents the model behind the search form of `app\models\Events`.
+ * EventsSearch represents the model behind the search form of `app\models\Events`.
  */
-class EventwsSearch extends Events
+class EventsSearch extends Events
 {
     /**
      * {@inheritdoc}
@@ -17,8 +17,8 @@ class EventwsSearch extends Events
     public function rules()
     {
         return [
-            [['id'], 'integer'],
-            [['title', 'hall', 'date'], 'safe'],
+            [['id', 'is_active'], 'integer'],
+            [['title', 'hall', 'date', 'session_id'], 'safe'],
         ];
     }
 
@@ -59,7 +59,9 @@ class EventwsSearch extends Events
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'session_id' => $this->id,
             'date' => $this->date,
+            'is_active' => $this->is_active
         ]);
 
         $query->andFilterWhere(['like', 'title', $this->title])

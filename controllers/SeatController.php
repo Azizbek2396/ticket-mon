@@ -21,7 +21,11 @@ class SeatController extends Controller
         $zakrep_arr = [];
         $accessable_count = 0;
         foreach ($models as $key) {
-            $colorclass = substr(hash('ripemd160', $key->comment), -6);
+            if ($key->comment == 'Проданное место') {
+                $colorclass = 'CCCCCC';
+            } else {
+                $colorclass = substr(hash('ripemd160', $key->comment), -6);
+            }
             $zakrep_arr[$key->seat_id] = [
                 'color' => $colorclass,
                 'comment' => $key->comment,

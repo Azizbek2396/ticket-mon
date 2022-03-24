@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Events;
+use GuzzleHttp\Client;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
@@ -147,20 +148,14 @@ class SiteController extends Controller
         if(!file_exists($path)) {
             throw new NotFoundHttpException("File not found!");
         }
-        $events = ArrayHelper::map(Events::find()->all(), 'id', 'title');
-
-//        $models = Saver::find()->where(['event_id'=>$this::EVENTID])->all();
+        $events = ArrayHelper::map(Events::find()->where(['is_active' => 1])->all(), 'id', 'title');
 
         return $this->render('scheme', [
-//            'models'    => $models,
             'id' => $id,
             'path'      => $path,
             'events'    => $events
         ]);
     }
-
-
-
 
     public function actionTest()
     {
@@ -177,13 +172,11 @@ class SiteController extends Controller
     public function actionSaver($id)
     {
         foreach (Yii::$app->request->post('seats') as $key => $value) {
-//            var_dump($value);die();
             $model = new Saver();
             $model->event_id = $id;
             $model->seat_id = $value['seatid'];
             $model->place_title = $value['title'];
             $model->comment = Yii::$app->request->post('comment');
-//            var_dump(Yii::$app->request->post('comment'));die();
             $model->color = substr(hash('ripemd160', Yii::$app->request->post('comment')), -6);
             if(Saver::find()->where(['event_id'=>$model->event_id,'seat_id'=>$model->seat_id])->one()){
                 $a = 1;
@@ -196,6 +189,97 @@ class SiteController extends Controller
         }
         return $this->redirect(['scheme', 'id'=>$id] );
         die;
+    }
+
+    public function actionAuth()
+    {
+        $client = new Client();
+        $url = 'https://cabinet.cultureticket.uz/api/CultureTicket/Token';
+
+        $res = $client->request('POST', $url, [
+            'json' => [
+                "login" => 'umar@iticket.uz',
+                "password" => '123456'
+            ],
+            'verify' => false
+        ]);
+
+        $json = json_decode($res->getBody()->getContents(), true);
+        $path = dirname(__DIR__, 1) . '/web/data/auth';
+
+        if (isset($json['result']['accessToken'])){
+            file_put_contents($path, $json['result']['accessToken']);
+        }
+        var_dump($json);
+    }
+
+    public function getToken()
+    {
+        $token = file_get_contents(dirname(__DIR__, 1) . '/web/data/auth');
+        return $token;
+    }
+
+    public function getResponse($url) {
+        $client = new Client();
+        $res = $client->request('GET', $url, [
+            'headers' => [
+                'Authorization' => "Bearer " . $this->getToken(),
+            ],
+            'verify' => false
+        ]);
+
+        return $res;
+    }
+
+    public function actionSold()
+    {
+        $events = Events::find()->all();
+
+        foreach ($events as $event) {
+            $url1 ='https://cabinet.cultureticket.uz/api/CultureTicket/SessionTickets/' . $event->session_id;
+            $res = $this->getResponse($url1);
+            $tickets = json_decode($res->getBody()->getContents(), true);
+
+            $url2 = 'https://cabinet.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $event->hall;
+            $res2 = $this->getResponse($url2);
+            $seats = json_decode($res2->getBody()->getContents(), true);
+
+            $soldTickets = [];
+            foreach ($tickets['result'] as $ticket) {
+                if(($ticket['ticketStatusName'] === "Проданный") && ($ticket['tarifName'] !== "Пригласительное место")) {
+                    array_push($soldTickets, $ticket);
+                }
+            }
+
+            $soldSeats = [];
+            foreach ($soldTickets as $ticket) {
+                foreach ($seats['result'] as $seat) {
+                    if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
+                        array_push($soldSeats, $seat);
+                    } else {
+
+                    }
+                }
+            }
+
+            if (!empty($soldSeats)){
+                foreach ($soldSeats as $soldSeat) {
+                    $model = new Saver();
+                    $model->event_id = $event->id;
+                    $model->seat_id = 'seat-' . $soldSeat['svgSeatId'];
+                    $model->place_title = 'Sector: ' . $soldSeat['sectorName'] . ' Row: ' . $soldSeat['rowNumber'] . ' Seat: ' . $soldSeat['seatNumber'];
+                    $model->comment = 'Проданное место';
+                    $model->color = 'CCCCCC';
+                    if(Saver::find()->where(['event_id'=>$event->id,'seat_id'=>$model->seat_id])->one()){
+                        $a = 1;
+                    } else{
+                        $model->save();
+                    }
+                }
+            }
+        }
+
+
     }
 
     public function actionDownload($id)
@@ -241,15 +325,8 @@ class SiteController extends Controller
             $row++;
         }
 
-            $activeSheet->setCellValueExplicit('B'.$row, 'Всего', \PHPExcel_Cell_DataType::TYPE_STRING);
-            $activeSheet->setCellValueExplicit('C'.$row, $amount, \PHPExcel_Cell_DataType::TYPE_NUMERIC);
-
-
-
-        
-
-
-
+        $activeSheet->setCellValueExplicit('B'.$row, 'Всего', \PHPExcel_Cell_DataType::TYPE_STRING);
+        $activeSheet->setCellValueExplicit('C'.$row, $amount, \PHPExcel_Cell_DataType::TYPE_NUMERIC);
 
         $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel,  "Excel2007");
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
