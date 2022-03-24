@@ -176,6 +176,7 @@ $this->title = 'Рассадка';
     curl(url);
 
     const resetComments = function () {
+        $('.comments').html('');
         curl(url);
     }
 
