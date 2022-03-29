@@ -63,19 +63,29 @@ class SaleController extends Controller
             $seats = json_decode($res2->getBody()->getContents(), true);
 
             $soldTickets = [];
+            $rejectedTickets = [];
             foreach ($tickets['result'] as $ticket) {
                 if(($ticket['ticketStatusName'] === "Проданный") && ($ticket['tarifName'] !== "Пригласительное место")) {
                     array_push($soldTickets, $ticket);
                 }
+                if($ticket['ticketStatusName'] === "Возвратный") {
+                    array_push($rejectedTickets, $ticket);
+                }
             }
 
             $soldSeats = [];
+            $rejectedSeats = [];
             foreach ($soldTickets as $ticket) {
                 foreach ($seats['result'] as $seat) {
                     if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
                         array_push($soldSeats, $seat);
-                    } else {
-
+                    }
+                }
+            }
+            foreach ($rejectedTickets as $ticket) {
+                foreach ($seats['result'] as $seat) {
+                    if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
+                        array_push($rejectedSeats, $seat);
                     }
                 }
             }
@@ -95,8 +105,14 @@ class SaleController extends Controller
                     }
                 }
             }
+            if (!empty($rejectedSeats)) {
+                foreach ($rejectedSeats as $rejectedSeat) {
+                    if (Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one()){
+                        Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one()->delete();
+                    }
+                }
+            }
         }
-
 
     }
 }

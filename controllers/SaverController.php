@@ -109,12 +109,13 @@ class SaverController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    public function actionDelete($id, $page)
     {
         $event_id = $this->findModel($id)->event_id;
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index', 'id' => $event_id]);
+
+        return $this->redirect(['index', 'id' => $event_id, 'page' => $page]);
     }
 
     /**

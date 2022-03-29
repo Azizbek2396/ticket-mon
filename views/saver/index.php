@@ -9,6 +9,7 @@ use yii\grid\GridView;
 
 $this->title = Yii::t('custom', 'Рассадка');
 $this->params['breadcrumbs'][] = $this->title;
+//var_dump(Yii::$app->request->getQueryParam('page'));die();
 ?>
 <div class="container-fluid">
     <div class="row">
@@ -20,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?= Html::a(Yii::t('custom', 'Создать'), ['site/scheme'], ['class' => 'btn btn-success']) ?>
                         </div>
                     </div>
-
+                    <input type="hidden" name="page" value="<?= Yii::$app->request->getQueryParam('page') ?>">
 
                     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -28,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'dataProvider' => $dataProvider,
                         'filterModel' => $searchModel,
                         'columns' => [
-                            ['class' => 'yii\grid\SerialColumn'],
+//                            ['class' => 'yii\grid\SerialColumn'],
 
                             'id',
                             'event_id',
@@ -36,11 +37,28 @@ $this->params['breadcrumbs'][] = $this->title;
                             'comment',
                             'place_title',
 
-                            ['class' => 'yii\grid\ActionColumn'],
+                            [
+                                'class' => 'yii\grid\ActionColumn',
+                                'buttons'  => [
+
+                                    'delete' => function($url, $model) {
+
+	                                        return Html::a('<span class="glyphicon glyphicon-trash"></span>',
+                                                ['delete', 'id' => $model['id'], 'page' => Yii::$app->request->getQueryParam('page')],
+                                                [
+                                                        'title' => 'Удалить', 'data-confirm' => 'Вы уверены, что хотите удалить этот элемент?','data-method' => 'post'
+                                                ]
+                                            );
+                                        }
+
+                                    ]
+                            ],
                         ],
                         'summaryOptions' => ['class' => 'summary mb-2'],
                         'pager' => [
                             'class' => 'yii\bootstrap4\LinkPager',
+                            'firstPageLabel' => 'First',
+                            'lastPageLabel' => 'Last',
                         ]
                     ]); ?>
 

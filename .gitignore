@@ -20,7 +20,7 @@ composer.phar
 
 # db file
 config/db.php
-web/data/auth
+web/data/*
 
 # Mac DS_Store Files
 .DS_Store
