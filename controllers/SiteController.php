@@ -366,20 +366,12 @@ class SiteController extends Controller
         $activeSheet = $objPHPExcel->getActiveSheet();
         $row = 2;
 
-        $path = \Yii::getAlias('@webroot') . "/events/".$id .".json" ;
+        $events = Events::find()->select(['event_id'])->distinct()->all();
 
-        if(!file_exists($path)) {
-            return [
-                "code" 		=> 1,
-                "description" 	=>"File Not Found!"
-            ];
-        }
-
-        $event_ids = json_decode(file_get_contents($path), true);
         $url = "https://cabinet.cultureticket.uz/api/CultureTicket/Sessions/";
 
-        foreach($event_ids as $id) {
-            $res      = $this->getResponse($url . $id);
+        foreach($events as $event) {
+            $res      = $this->getResponse($url . $event->event_id);
             $sessions = json_decode($res->getBody()->getContents(), true);
             foreach($sessions["result"] as $session) {
                 $counter = $this->calc($session["sessionId"]);
@@ -401,7 +393,7 @@ class SiteController extends Controller
         exit;
     }
 
-    public function calc($sessionId = '5614')
+    public function calc($sessionId)
     {
 
         $url = "https://cabinet.cultureticket.uz/api/CultureTicket/SessionTickets/";

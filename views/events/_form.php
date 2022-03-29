@@ -20,6 +20,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'hall')->textInput() ?>
 
+    <?= $form->field($model, 'event_id')->textInput() ?>
+
     <?= $form->field($model, 'session_id')->textInput() ?>
 
     <?= $form->field($model, 'date')->textInput(['type' => 'date']) ?>
