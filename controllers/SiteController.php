@@ -313,7 +313,6 @@ class SiteController extends Controller
         $sheet = 0;
         $objPHPExcel->setActiveSheetIndex($sheet);
         $activeSheet = $objPHPExcel->getActiveSheet();
-
         $row = 2;
         $models = Saver::find()->where(['event_id'=>$id])->all();
 
@@ -351,5 +350,91 @@ class SiteController extends Controller
         header('Cache-Control: max-age=0');
         $objWriter->save('php://output');
         exit;
+    }
+
+    public function actionReport($id = 1)
+    {
+        ini_set('memory_limit', '512M');
+        set_time_limit(10 * 60);
+
+        require('../vendor/PHPExcel/PHPExcel.php');
+        $objPHPExcel = new \PHPExcel;
+        $url = './excel/report.xlsx';
+        $objPHPExcel = \PHPExcel_IOFactory::load($url);
+        $sheet = 0;
+        $objPHPExcel->setActiveSheetIndex($sheet);
+        $activeSheet = $objPHPExcel->getActiveSheet();
+        $row = 2;
+
+        $path = \Yii::getAlias('@webroot') . "/events/".$id .".json" ;
+
+        if(!file_exists($path)) {
+            return [
+                "code" 		=> 1,
+                "description" 	=>"File Not Found!"
+            ];
+        }
+
+        $event_ids = json_decode(file_get_contents($path), true);
+        $url = "https://cabinet.cultureticket.uz/api/CultureTicket/Sessions/";
+
+        foreach($event_ids as $id) {
+            $res      = $this->getResponse($url . $id);
+            $sessions = json_decode($res->getBody()->getContents(), true);
+            foreach($sessions["result"] as $session) {
+                $counter = $this->calc($session["sessionId"]);
+                $activeSheet->setCellValueExplicit('A'.$row, $session["eventName"], \PHPExcel_Cell_DataType::TYPE_STRING);
+                $activeSheet->setCellValueExplicit('B'.$row, date("d.m.Y", strtotime($session["beginDate"])), \PHPExcel_Cell_DataType::TYPE_STRING);
+                $activeSheet->setCellValueExplicit('C'.$row, $session["palaceName"], \PHPExcel_Cell_DataType::TYPE_STRING);
+                $activeSheet->setCellValueExplicit('D'.$row, $counter["sold"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                $activeSheet->setCellValueExplicit('E'.$row, $counter["free"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                $activeSheet->setCellValueExplicit('F'.$row, $counter["sum"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                $row++;
+            }
+        }
+
+        $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel,  "Excel2007");
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="report_'.date("Y-m-d").'.xlsx"');
+        header('Cache-Control: max-age=0');
+        $objWriter->save('php://output');
+        exit;
+    }
+
+    public function calc($sessionId = '5614')
+    {
+
+        $url = "https://cabinet.cultureticket.uz/api/CultureTicket/SessionTickets/";
+        $url1 = "https://cabinet.cultureticket.uz/api/CultureTicket/Tarifs/";
+
+        $res = $this->getResponse($url . $sessionId);
+        $res1 = $this->getResponse($url1 . $sessionId);
+
+
+        $tickets = json_decode($res->getBody()->getContents(), true);
+        $tarifs = json_decode($res1->getBody()->getContents(), true);
+
+        $counter = [
+            'sold' => 0,
+            'free' => 0,
+            'sum'  => 0,
+        ];
+
+        foreach($tickets["result"] as $ticket) {
+            if($ticket["ticketStatusId"] == 3 || $ticket["ticketStatusId"] == 7) {
+                if($ticket["tarifName"] == "Пригласительное место") {
+                    $counter["free"]++;
+                } else {
+                    $counter["sold"]++;
+                    foreach ($tarifs['result'] as $tarif) {
+                        if ($ticket["tarifId"] == $tarif["id"]){
+                            $counter["sum"] += $tarif["price"];
+                        }
+                    }
+                }
+            }
+        }
+
+        return $counter;
     }
 }

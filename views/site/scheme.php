@@ -24,8 +24,8 @@ $this->title = 'Рассадка';
         <div class="row mb-4">
 
             <div class="col-lg-4 mb-4"><?=Html::dropDownList('id', $id, $events, ['class'=>'form-control'])?></div>
-            <div class="col-lg-4"><?= Html::submitButton('Перейти', ['class' => 'btn btn-primary']) ?></div>
-
+            <div class="col-lg-2 mb-4"><?= Html::submitButton('Перейти', ['class' => 'btn btn-primary']) ?></div>
+            <div class="col-lg-4"><a href="?r=site/report" class="btn btn-success">СВОДНЫЙ ОТЧЁТ</a></div>
         </div>
     <?php ActiveForm::end(); ?>
 
