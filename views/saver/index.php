@@ -42,9 +42,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'buttons'  => [
 
                                     'delete' => function($url, $model) {
-
 	                                        return Html::a('<span class="glyphicon glyphicon-trash"></span>',
-                                                ['delete', 'id' => $model['id'], 'page' => Yii::$app->request->getQueryParam('page')],
+                                                ['delete', 'id' => $model['id'], 'page' => (Yii::$app->request->getQueryParam('page')) ? Yii::$app->request->getQueryParam('page') : '1'],
                                                 [
                                                         'title' => 'Удалить', 'data-confirm' => 'Вы уверены, что хотите удалить этот элемент?','data-method' => 'post'
                                                 ]
