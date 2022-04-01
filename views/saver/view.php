@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-12">
                     <p>
                         <?= Html::a(Yii::t('custom', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                        <?= Html::a(Yii::t('custom', 'Delete'), ['delete', 'id' => $model->id], [
+                        <?= Html::a(Yii::t('custom', 'Delete'), ['delete', 'id' => $model->id, 'page' => (Yii::$app->request->getQueryParam('page')) ? Yii::$app->request->getQueryParam('page') : '1'], [
                             'class' => 'btn btn-danger',
                             'data' => [
                                 'confirm' => Yii::t('custom', 'Are you sure you want to delete this item?'),
