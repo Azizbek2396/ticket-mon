@@ -210,7 +210,8 @@ class SiteController extends Controller
         if (isset($json['result']['accessToken'])){
             file_put_contents($path, $json['result']['accessToken']);
         }
-        var_dump($json);
+        return $json['result']['accessToken'];
+//        var_dump($json);
     }
 
     public function getToken()
@@ -356,6 +357,7 @@ class SiteController extends Controller
     {
         ini_set('memory_limit', '512M');
         set_time_limit(10 * 60);
+        $this->actionAuth();
 
         require('../vendor/PHPExcel/PHPExcel.php');
         $objPHPExcel = new \PHPExcel;
