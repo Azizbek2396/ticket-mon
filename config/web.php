@@ -14,6 +14,9 @@ $config = [
         '@npm'   => '@vendor/npm-asset',
     ],
     'components' => [
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager', // or use 'yii\rbac\DbManager'
+        ],
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'edNjfpTrzbZVauVV-z7iJrtjx1IiyPaj',
@@ -26,7 +29,7 @@ $config = [
         ],
         'user' => [
             'identityClass' => 'app\models\User',
-            'enableAutoLogin' => true,
+            'loginUrl' => ['site/login'],
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -56,13 +59,6 @@ $config = [
 //            ],
 //        ],
 
-        // 'view' => [
-        //     'theme' => [
-        //         'pathMap' => [
-        //             '@app/views' => '@vendor/hail812/yii2-adminlte3/src/views'
-        //         ],
-        //     ],
-        // ],
         'i18n'  => [
             'translations' => [
                 'custom' => [
@@ -80,6 +76,29 @@ $config = [
         'admin' => [
             'class' => 'app\modules\admin\Module',
         ],
+        'rbac' => [
+            'class' => 'mdm\admin\Module',
+            'controllerMap' => [
+                'assignment' => [
+                    'class' => 'mdm\admin\controllers\AssignmentController',
+                    /* 'userClassName' => 'app\models\User', */
+                    'idField' => 'id',
+                    'usernameField' => 'username',
+//                    'fullnameField' => 'profile.full_name',
+                ],
+            ],
+            'layout' => 'left-menu',
+            'mainLayout' => '@app/views/layouts/rbac.php',
+        ]
+    ],
+    'as access' => [
+        'class' => 'mdm\admin\components\AccessControl',
+        'allowActions' => [
+//            'site/*',
+//            'admin/*',
+//            'rbac/*',
+//            'some-controller/some-action',
+        ]
     ],
     'params' => $params,
 ];

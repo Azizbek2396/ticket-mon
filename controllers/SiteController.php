@@ -11,7 +11,8 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\filters\VerbFilter;
-use app\models\LoginForm;
+use app\models\LoginForm as Login;
+use app\models\Signup as Signup;
 use app\models\ContactForm;
 use app\models\Saver;
 
@@ -79,19 +80,18 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-        if (!Yii::$app->user->isGuest) {
+        if (!Yii::$app->getUser()->isGuest) {
             return $this->goHome();
         }
 
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+        $model = new Login();
+        if ($model->load(Yii::$app->getRequest()->post()) && $model->login()) {
             return $this->goBack();
+        } else {
+            return $this->render('login', [
+                'model' => $model,
+            ]);
         }
-
-        $model->password = '';
-        return $this->render('login', [
-            'model' => $model,
-        ]);
     }
 
     /**
@@ -105,6 +105,21 @@ class SiteController extends Controller
 
         return $this->goHome();
     }
+
+    public function actionSignup()
+    {
+        $model = new Signup();
+        if ($model->load(Yii::$app->getRequest()->post())) {
+            if ($user = $model->signup()) {
+                return $this->goHome();
+            }
+        }
+
+        return $this->render('signup', [
+            'model' => $model,
+        ]);
+    }
+
 
     /**
      * Displays contact page.
@@ -161,7 +176,6 @@ class SiteController extends Controller
     {
         $this->layout = "a";
         $models = Saver::find()->where(['event_id'=>$this::EVENTID])->all();
-
 
 
         return $this->render('test', [
