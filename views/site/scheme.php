@@ -8,6 +8,22 @@ $this->title = 'Рассадка';
 ?>
 
 <div class="site-index">
+    <div class="row d-flex justify-content-end">
+        <div class="col-lg-2 mb-2">
+            <?=
+            Yii::$app->user->isGuest ? (
+            ['label' => 'Войти', 'url' => ['/site/login']]
+            ) : (
+                Html::beginForm(['/site/logout'], 'post', ['class' => 'form-inline'])
+                . Html::submitButton(
+                    'Выйти (' . Yii::$app->user->identity->username . ')',
+                    ['class' => 'btn btn-link logout']
+                )
+                . Html::endForm()
+            )
+            ?>
+        </div>
+    </div>
     <div class="row mb-4">
         <div class="col-lg-4 mb-4">
             <input type="text" name="zarep_name" id="zakreptext" class="form-control" oninput="zakrepTextInput()" placeholder="Введите комментарий..." />
@@ -25,9 +41,10 @@ $this->title = 'Рассадка';
 
             <div class="col-lg-4 mb-4"><?=Html::dropDownList('id', $id, $events, ['class'=>'form-control'])?></div>
             <div class="col-lg-2 mb-4"><?= Html::submitButton('Перейти', ['class' => 'btn btn-primary']) ?></div>
-            <div class="col-lg-4"><a href="?r=site/report" class="btn btn-success">СВОДНЫЙ ОТЧЁТ</a></div>
+            <div class="col-lg-2 mb-4"><a href="?r=site/report" class="btn btn-success">СВОДНЫЙ ОТЧЁТ</a></div>
         </div>
     <?php ActiveForm::end(); ?>
+
 
 <!--    <div id="accessable_places"><span id='accessable_color_span'></span> Свободные места: <span id='accessable_count'></span></div>-->
     <div class="row">

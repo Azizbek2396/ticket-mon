@@ -38,7 +38,7 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav ml-auto'],
         'items' => [
 //            ['label' => 'Главная', 'url' => ['/admin/default/index']],
-//            ['label' => 'О Нас', 'url' => ['/site/about']],
+            ['label' => 'Регистрация', 'url' => ['/rbac/user/signup/']],
             ['label' => 'Пользователы', 'url' => ['/rbac/default/index/']],
             Yii::$app->user->isGuest ? (
             ['label' => 'Войти', 'url' => ['/site/login']]
