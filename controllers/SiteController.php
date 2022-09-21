@@ -376,7 +376,7 @@ class SiteController extends Controller
 
         require('../vendor/PHPExcel/PHPExcel.php');
         $objPHPExcel = new \PHPExcel;
-        $url = './excel/report.xlsx';
+        $url = './excel/report1.xlsx';
         $objPHPExcel = \PHPExcel_IOFactory::load($url);
         $sheet = 0;
         $objPHPExcel->setActiveSheetIndex($sheet);
@@ -391,6 +391,7 @@ class SiteController extends Controller
         foreach($events as $event) {
             if ($event["event_id"]){
                 $res      = $this->getResponse($url . $event->event_id);
+                $hallId = Events::find()->where(['event_id' => $event->event_id])->one()->hall;
                 $sessions = json_decode($res->getBody()->getContents(), true);
                 foreach($sessions["result"] as $session) {
                     $counter = $this->calc($session["sessionId"]);
@@ -399,7 +400,9 @@ class SiteController extends Controller
                     $activeSheet->setCellValueExplicit('C'.$row, $session["palaceName"], \PHPExcel_Cell_DataType::TYPE_STRING);
                     $activeSheet->setCellValueExplicit('D'.$row, $counter["sold"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
                     $activeSheet->setCellValueExplicit('E'.$row, $counter["free"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
-                    $activeSheet->setCellValueExplicit('F'.$row, $counter["sum"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $activeSheet->setCellValueExplicit('F'.$row, $this->seatCalc($hallId) - $counter["sold"] - $counter["free"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $activeSheet->setCellValueExplicit('G'.$row, $this->seatCalc($hallId), \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $activeSheet->setCellValueExplicit('H'.$row, $counter["sum"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
                     $row++;
                 }
             }
@@ -448,5 +451,15 @@ class SiteController extends Controller
         }
 
         return $counter;
+    }
+
+    public function seatCalc($hallId)
+    {
+        $url ='https://cabinet.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $hallId;
+        $res = $this->getResponse($url);
+        $seats = json_decode($res->getBody()->getContents(), true);
+        $total = count($seats['result']);
+
+        return $total;
     }
 }
