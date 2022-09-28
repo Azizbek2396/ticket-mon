@@ -251,67 +251,68 @@ class SiteController extends Controller
         $events = Events::find()->all();
 
         foreach ($events as $event) {
-            $url1 ='https://cabinet.cultureticket.uz/api/CultureTicket/SessionTickets/' . $event->session_id;
-            $res = $this->getResponse($url1);
-            $tickets = json_decode($res->getBody()->getContents(), true);
+            if ($event->session_id) {
+                $url1 ='https://cabinet.cultureticket.uz/api/CultureTicket/SessionTickets/' . $event->session_id;
+                $res = $this->getResponse($url1);
+                $tickets = json_decode($res->getBody()->getContents(), true);
 
-            $url2 = 'https://cabinet.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $event->hall;
-            $res2 = $this->getResponse($url2);
-            $seats = json_decode($res2->getBody()->getContents(), true);
+                $url2 = 'https://cabinet.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $event->hall;
+                $res2 = $this->getResponse($url2);
+                $seats = json_decode($res2->getBody()->getContents(), true);
 
-            $soldTickets = [];
-            $rejectedTickets = [];
-            foreach ($tickets['result'] as $ticket) {
-                if(($ticket['ticketStatusName'] === "Проданный") && ($ticket['tarifName'] !== "Пригласительное место")) {
-                    array_push($soldTickets, $ticket);
-                }
-                if($ticket['ticketStatusName'] === "Возвратный") {
-                    array_push($rejectedTickets, $ticket);
-                }
-            }
-
-            $soldSeats = [];
-            $rejectedSeats = [];
-            foreach ($soldTickets as $ticket) {
-                foreach ($seats['result'] as $seat) {
-                    if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
-                        array_push($soldSeats, $seat);
+                $soldTickets = [];
+                $rejectedTickets = [];
+                foreach ($tickets['result'] as $ticket) {
+                    if(($ticket['ticketStatusName'] === "Проданный") && ($ticket['tarifName'] !== "Пригласительное место")) {
+                        array_push($soldTickets, $ticket);
+                    }
+                    if($ticket['ticketStatusName'] === "Возвратный") {
+                        array_push($rejectedTickets, $ticket);
                     }
                 }
-            }
-            foreach ($rejectedTickets as $ticket) {
-                foreach ($seats['result'] as $seat) {
-                    if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
-                        array_push($rejectedSeats, $seat);
-                    }
-                }
-            }
 
-            if (!empty($soldSeats)){
-                foreach ($soldSeats as $soldSeat) {
-                    $model = new Saver();
-                    $model->event_id = $event->id;
-                    $model->seat_id = 'seat-' . $soldSeat['svgSeatId'];
-                    $model->place_title = 'Sector: ' . $soldSeat['sectorName'] . ' Row: ' . $soldSeat['rowNumber'] . ' Seat: ' . $soldSeat['seatNumber'];
-                    $model->comment = 'Проданное место';
-                    $model->color = 'CCCCCC';
-                    if(Saver::find()->where(['event_id'=>$event->id,'seat_id'=>$model->seat_id])->one()){
-                        $a = 1;
-                    } else{
-                        $model->save();
+                $soldSeats = [];
+                $rejectedSeats = [];
+                foreach ($soldTickets as $ticket) {
+                    foreach ($seats['result'] as $seat) {
+                        if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
+                            array_push($soldSeats, $seat);
+                        }
                     }
                 }
-            }
-            if (!empty($rejectedSeats)) {
-                foreach ($rejectedSeats as $rejectedSeat) {
-                    if (Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one()){
-                        Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one()->delete();
+                foreach ($rejectedTickets as $ticket) {
+                    foreach ($seats['result'] as $seat) {
+                        if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
+                            array_push($rejectedSeats, $seat);
+                        }
+                    }
+                }
+
+                if (!empty($soldSeats)){
+                    foreach ($soldSeats as $soldSeat) {
+                        $model = new Saver();
+                        $model->event_id = $event->id;
+                        $model->seat_id = 'seat-' . $soldSeat['svgSeatId'];
+                        $model->place_title = 'Sector: ' . $soldSeat['sectorName'] . ' Row: ' . $soldSeat['rowNumber'] . ' Seat: ' . $soldSeat['seatNumber'];
+                        $model->comment = 'Проданное место';
+                        $model->color = 'CCCCCC';
+                        if(Saver::find()->where(['event_id'=>$event->id,'seat_id'=>$model->seat_id])->one()){
+                            $a = 1;
+                        } else{
+                            $model->save();
+                        }
+                    }
+                }
+                if (!empty($rejectedSeats)) {
+                    foreach ($rejectedSeats as $rejectedSeat) {
+                        if (Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one()){
+                            Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one()->delete();
+                        }
                     }
                 }
             }
         }
-
-
+        return "Sold tickets are recalculated";
     }
 
     public function actionDownload($id)
@@ -375,7 +376,7 @@ class SiteController extends Controller
 
         require('../vendor/PHPExcel/PHPExcel.php');
         $objPHPExcel = new \PHPExcel;
-        $url = './excel/report.xlsx';
+        $url = './excel/report1.xlsx';
         $objPHPExcel = \PHPExcel_IOFactory::load($url);
         $sheet = 0;
         $objPHPExcel->setActiveSheetIndex($sheet);
@@ -383,21 +384,27 @@ class SiteController extends Controller
         $row = 2;
 
         $events = Events::find()->select(['event_id'])->distinct()->all();
+//        var_dump($events[0]["event_id"]);die();
 
         $url = "https://cabinet.cultureticket.uz/api/CultureTicket/Sessions/";
 
         foreach($events as $event) {
-            $res      = $this->getResponse($url . $event->event_id);
-            $sessions = json_decode($res->getBody()->getContents(), true);
-            foreach($sessions["result"] as $session) {
-                $counter = $this->calc($session["sessionId"]);
-                $activeSheet->setCellValueExplicit('A'.$row, $session["eventName"], \PHPExcel_Cell_DataType::TYPE_STRING);
-                $activeSheet->setCellValueExplicit('B'.$row, date("d.m.Y", strtotime($session["beginDate"])), \PHPExcel_Cell_DataType::TYPE_STRING);
-                $activeSheet->setCellValueExplicit('C'.$row, $session["palaceName"], \PHPExcel_Cell_DataType::TYPE_STRING);
-                $activeSheet->setCellValueExplicit('D'.$row, $counter["sold"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
-                $activeSheet->setCellValueExplicit('E'.$row, $counter["free"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
-                $activeSheet->setCellValueExplicit('F'.$row, $counter["sum"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
-                $row++;
+            if ($event["event_id"]){
+                $res      = $this->getResponse($url . $event->event_id);
+                $hallId = Events::find()->where(['event_id' => $event->event_id])->one()->hall;
+                $sessions = json_decode($res->getBody()->getContents(), true);
+                foreach($sessions["result"] as $session) {
+                    $counter = $this->calc($session["sessionId"]);
+                    $activeSheet->setCellValueExplicit('A'.$row, $session["eventName"], \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $activeSheet->setCellValueExplicit('B'.$row, date("d.m.Y", strtotime($session["beginDate"])), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $activeSheet->setCellValueExplicit('C'.$row, $session["palaceName"], \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $activeSheet->setCellValueExplicit('D'.$row, $counter["sold"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $activeSheet->setCellValueExplicit('E'.$row, $counter["free"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $activeSheet->setCellValueExplicit('F'.$row, $this->seatCalc($hallId) - $counter["sold"] - $counter["free"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $activeSheet->setCellValueExplicit('G'.$row, $this->seatCalc($hallId), \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $activeSheet->setCellValueExplicit('H'.$row, $counter["sum"], \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                    $row++;
+                }
             }
         }
 
@@ -444,5 +451,15 @@ class SiteController extends Controller
         }
 
         return $counter;
+    }
+
+    public function seatCalc($hallId)
+    {
+        $url ='https://cabinet.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $hallId;
+        $res = $this->getResponse($url);
+        $seats = json_decode($res->getBody()->getContents(), true);
+        $total = count($seats['result']);
+
+        return $total;
     }
 }
