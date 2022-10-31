@@ -207,6 +207,7 @@ class SiteController extends Controller
 
     public function actionAuth()
     {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $client = new Client();
         $url = 'https://cabinet.cultureticket.uz/api/CultureTicket/Token';
 
@@ -224,7 +225,7 @@ class SiteController extends Controller
         if (isset($json['result']['accessToken'])){
             file_put_contents($path, $json['result']['accessToken']);
         }
-        return $json['result']['accessToken'];
+        return $json;
 //        var_dump($json);
     }
 
@@ -251,7 +252,7 @@ class SiteController extends Controller
         $events = Events::find()->all();
 
         foreach ($events as $event) {
-            if ($event->session_id) {
+            if ($event->session_id && ($event->is_active === 1)) {
                 $url1 ='https://cabinet.cultureticket.uz/api/CultureTicket/SessionTickets/' . $event->session_id;
                 $res = $this->getResponse($url1);
                 $tickets = json_decode($res->getBody()->getContents(), true);
