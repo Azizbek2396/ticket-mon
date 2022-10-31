@@ -54,65 +54,67 @@ class SaleController extends Controller
         $events = Events::find()->all();
 
         foreach ($events as $event) {
-            $url1 ='https://cabinet.cultureticket.uz/api/CultureTicket/SessionTickets/' . $event->session_id;
-            $res = $this->getResponse($url1);
-            $tickets = json_decode($res->getBody()->getContents(), true);
+            if ($event->session_id && ($event->is_active === 1)) {
+                $url1 ='https://cabinet.cultureticket.uz/api/CultureTicket/SessionTickets/' . $event->session_id;
+                $res = $this->getResponse($url1);
+                $tickets = json_decode($res->getBody()->getContents(), true);
 
-            $url2 = 'https://cabinet.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $event->hall;
-            $res2 = $this->getResponse($url2);
-            $seats = json_decode($res2->getBody()->getContents(), true);
+                $url2 = 'https://cabinet.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $event->hall;
+                $res2 = $this->getResponse($url2);
+                $seats = json_decode($res2->getBody()->getContents(), true);
 
-            $soldTickets = [];
-            $rejectedTickets = [];
-            foreach ($tickets['result'] as $ticket) {
-                if(($ticket['ticketStatusName'] === "Проданный") && ($ticket['tarifName'] !== "Пригласительное место")) {
-                    array_push($soldTickets, $ticket);
-                }
-                if($ticket['ticketStatusName'] === "Возвратный") {
-                    array_push($rejectedTickets, $ticket);
-                }
-            }
-
-            $soldSeats = [];
-            $rejectedSeats = [];
-            foreach ($soldTickets as $ticket) {
-                foreach ($seats['result'] as $seat) {
-                    if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
-                        array_push($soldSeats, $seat);
+                $soldTickets = [];
+                $rejectedTickets = [];
+                foreach ($tickets['result'] as $ticket) {
+                    if(($ticket['ticketStatusName'] === "Проданный") && ($ticket['tarifName'] !== "Пригласительное место")) {
+                        array_push($soldTickets, $ticket);
+                    }
+                    if($ticket['ticketStatusName'] === "Возвратный") {
+                        array_push($rejectedTickets, $ticket);
                     }
                 }
-            }
-            foreach ($rejectedTickets as $ticket) {
-                foreach ($seats['result'] as $seat) {
-                    if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
-                        array_push($rejectedSeats, $seat);
-                    }
-                }
-            }
 
-            if (!empty($soldSeats)){
-                foreach ($soldSeats as $soldSeat) {
-                    $model = new Saver();
-                    $model->event_id = $event->id;
-                    $model->seat_id = 'seat-' . $soldSeat['svgSeatId'];
-                    $model->place_title = 'Sector: ' . $soldSeat['sectorName'] . ' Row: ' . $soldSeat['rowNumber'] . ' Seat: ' . $soldSeat['seatNumber'];
-                    $model->comment = 'Проданное место';
-                    $model->color = 'CCCCCC';
-                    if(Saver::find()->where(['event_id'=>$event->id,'seat_id'=>$model->seat_id])->one()){
-                        $a = 1;
-                    } else{
-                        $model->save();
+                $soldSeats = [];
+                $rejectedSeats = [];
+                foreach ($soldTickets as $ticket) {
+                    foreach ($seats['result'] as $seat) {
+                        if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
+                            array_push($soldSeats, $seat);
+                        }
                     }
                 }
-            }
-            if (!empty($rejectedSeats)) {
-                foreach ($rejectedSeats as $rejectedSeat) {
-                    if (Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one()){
-                        Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one()->delete();
+                foreach ($rejectedTickets as $ticket) {
+                    foreach ($seats['result'] as $seat) {
+                        if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
+                            array_push($rejectedSeats, $seat);
+                        }
+                    }
+                }
+
+                if (!empty($soldSeats)){
+                    foreach ($soldSeats as $soldSeat) {
+                        $model = new Saver();
+                        $model->event_id = $event->id;
+                        $model->seat_id = 'seat-' . $soldSeat['svgSeatId'];
+                        $model->place_title = 'Sector: ' . $soldSeat['sectorName'] . ' Row: ' . $soldSeat['rowNumber'] . ' Seat: ' . $soldSeat['seatNumber'];
+                        $model->comment = 'Проданное место';
+                        $model->color = 'CCCCCC';
+                        if(Saver::find()->where(['event_id'=>$event->id,'seat_id'=>$model->seat_id])->one()){
+                            $a = 1;
+                        } else{
+                            $model->save();
+                        }
+                    }
+                }
+                if (!empty($rejectedSeats)) {
+                    foreach ($rejectedSeats as $rejectedSeat) {
+                        if (Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one()){
+                            Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one()->delete();
+                        }
                     }
                 }
             }
         }
-
+        return "Sold tickets are recalculated";
     }
 }
