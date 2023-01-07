@@ -21,7 +21,10 @@
         "hail812/yii2-adminlte3": "~1.1",
         "almasaeed2010/adminlte": "~3.1",
         "guzzlehttp/guzzle": "^7.3",
-        "mdmsoft/yii2-admin": "~2.0"
+        "mdmsoft/yii2-admin": "~2.0",
+        "kartik-v/yii2-widget-datepicker": "dev-master",
+        "kartik-v/yii2-field-range": "*",
+        "kartik-v/yii2-widget-select2": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

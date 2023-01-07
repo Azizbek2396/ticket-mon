@@ -226,7 +226,6 @@ class SiteController extends Controller
             file_put_contents($path, $json['result']['accessToken']);
         }
         return $json;
-//        var_dump($json);
     }
 
     public function getToken()
@@ -454,7 +453,7 @@ class SiteController extends Controller
         return $counter;
     }
 
-    public function seatCalc($hallId)
+    public function actionSeatCalc($hallId)
     {
         $url ='https://cabinet.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $hallId;
         $res = $this->getResponse($url);
