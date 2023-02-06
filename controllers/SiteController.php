@@ -370,8 +370,6 @@ class SiteController extends Controller
 
     public function actionReport($id = 1)
     {
-        ini_set('memory_limit', '512M');
-        set_time_limit(10 * 60);
         $this->actionAuth();
 
         require('../vendor/PHPExcel/PHPExcel.php');
@@ -453,7 +451,7 @@ class SiteController extends Controller
         return $counter;
     }
 
-    public function actionSeatCalc($hallId)
+    public function seatCalc($hallId)
     {
         $url ='https://cabinet.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $hallId;
         $res = $this->getResponse($url);
