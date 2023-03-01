@@ -21,6 +21,7 @@ composer.phar
 # db file
 config/db.php
 web/data/*
+test.log
 
 # Mac DS_Store Files
 .DS_Store

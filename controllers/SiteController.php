@@ -249,7 +249,6 @@ class SiteController extends Controller
     public function actionSold()
     {
         $events = Events::find()->all();
-
         foreach ($events as $event) {
             if ($event->session_id && ($event->is_active === 1)) {
                 $url1 ='https://cabinet.cultureticket.uz/api/CultureTicket/SessionTickets/' . $event->session_id;
@@ -262,6 +261,7 @@ class SiteController extends Controller
 
                 $soldTickets = [];
                 $rejectedTickets = [];
+                $newTickets = [];
                 foreach ($tickets['result'] as $ticket) {
                     if(($ticket['ticketStatusName'] === "Проданный") && ($ticket['tarifName'] !== "Пригласительное место")) {
                         array_push($soldTickets, $ticket);
@@ -269,10 +269,14 @@ class SiteController extends Controller
                     if($ticket['ticketStatusName'] === "Возвратный") {
                         array_push($rejectedTickets, $ticket);
                     }
+                    if($ticket['ticketStatusName'] === "Новый") {
+                        array_push($newTickets, $ticket);
+                    }
                 }
 
                 $soldSeats = [];
                 $rejectedSeats = [];
+                $newSeats = [];
                 foreach ($soldTickets as $ticket) {
                     foreach ($seats['result'] as $seat) {
                         if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
@@ -288,18 +292,49 @@ class SiteController extends Controller
                     }
                 }
 
+                foreach ($newTickets as $ticket) {
+                    foreach ($seats['result'] as $seat) {
+                        if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
+                            array_push($newSeats, $seat);
+                        }
+                    }
+                }
+
+                if (!empty($newSeats)) {
+                    foreach ($newSeats as $newSeat) {
+                        $seat = Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $newSeat['svgSeatId']])->one();
+                        if ($seat){
+                            $seat->comment = "На продаже";
+                            $seat->color = "C694C3";
+                            $seat->save(false);
+                        } else {
+                            $model = new Saver();
+                            $model->event_id = $event->id;
+                            $model->seat_id = 'seat-' . $newSeat['svgSeatId'];
+                            $model->place_title = 'Sector: ' . $newSeat['sectorName'] . ' Row: ' . $newSeat['rowNumber'] . ' Seat: ' . $newSeat['seatNumber'];
+                            $model->comment = 'На продаже';
+                            $model->color = 'C694C3';
+                            $model->save(false);
+                        }
+                    }
+                }
+
                 if (!empty($soldSeats)){
                     foreach ($soldSeats as $soldSeat) {
-                        $model = new Saver();
-                        $model->event_id = $event->id;
-                        $model->seat_id = 'seat-' . $soldSeat['svgSeatId'];
-                        $model->place_title = 'Sector: ' . $soldSeat['sectorName'] . ' Row: ' . $soldSeat['rowNumber'] . ' Seat: ' . $soldSeat['seatNumber'];
-                        $model->comment = 'Проданное место';
-                        $model->color = 'CCCCCC';
-                        if(Saver::find()->where(['event_id'=>$event->id,'seat_id'=>$model->seat_id])->one()){
-                            $a = 1;
-                        } else{
-                            $model->save();
+                        $seat = Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $soldSeat['svgSeatId']])->one();
+
+                        if ($seat) {
+                            $seat->comment = 'Проданное место';
+                            $seat->color = 'CCCCCC';
+                            $seat->save(false);
+                        } else {
+                            $model = new Saver();
+                            $model->event_id = $event->id;
+                            $model->seat_id = 'seat-' . $soldSeat['svgSeatId'];
+                            $model->place_title = 'Sector: ' . $soldSeat['sectorName'] . ' Row: ' . $soldSeat['rowNumber'] . ' Seat: ' . $soldSeat['seatNumber'];
+                            $model->comment = 'Проданное место';
+                            $model->color = 'CCCCCC';
+                            $model->save(false);
                         }
                     }
                 }
@@ -310,9 +345,10 @@ class SiteController extends Controller
                         }
                     }
                 }
+
             }
         }
-        return "Sold tickets are recalculated";
+        return "Sold tickets are recalculated. ExecutionTime: " . \Yii::getLogger()->getElapsedTime();
     }
 
     public function actionDownload($id)
@@ -452,6 +488,16 @@ class SiteController extends Controller
     }
 
     public function seatCalc($hallId)
+    {
+        $url ='https://cabinet.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $hallId;
+        $res = $this->getResponse($url);
+        $seats = json_decode($res->getBody()->getContents(), true);
+        $total = count($seats['result']);
+
+        return $total;
+    }
+
+    public function actionSeatCalc($hallId)
     {
         $url ='https://cabinet.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $hallId;
         $res = $this->getResponse($url);

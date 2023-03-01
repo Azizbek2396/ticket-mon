@@ -31,4 +31,9 @@ class HelloController extends Controller
 
         return ExitCode::OK;
     }
+
+    public function actionTest()
+    {
+        echo ' new elements uploaded' . " - " . date("d-m-Y H:i:s") .  PHP_EOL;
+    }
 }
