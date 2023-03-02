@@ -26,8 +26,6 @@ $this->title = 'Рассадка';
 </div>
 
 
-
-
 <script>
 
 

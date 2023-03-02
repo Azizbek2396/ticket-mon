@@ -49,6 +49,8 @@ class SaleController extends Controller
         return $res;
     }
 
+//  Crontab
+//  */1 * * * * /usr/bin/php /home/www/ticket-mon/yii hello/test >> /home/www/ticket-mon/test.log
     public function actionSold()
     {
         $events = Events::find()->all();
@@ -65,9 +67,13 @@ class SaleController extends Controller
                 $soldTickets = [];
                 $rejectedTickets = [];
                 $newTickets = [];
+                $invitationTickets = [];
                 foreach ($tickets['result'] as $ticket) {
                     if(($ticket['ticketStatusName'] === "Проданный") && ($ticket['tarifName'] !== "Пригласительное место")) {
                         array_push($soldTickets, $ticket);
+                    }
+                    if(($ticket['ticketStatusName'] === "Проданный") && ($ticket['tarifName'] === "Пригласительное место")) {
+                        array_push($invitationTickets, $ticket);
                     }
                     if($ticket['ticketStatusName'] === "Возвратный") {
                         array_push($rejectedTickets, $ticket);
@@ -80,6 +86,7 @@ class SaleController extends Controller
                 $soldSeats = [];
                 $rejectedSeats = [];
                 $newSeats = [];
+                $invitationSeats = [];
                 foreach ($soldTickets as $ticket) {
                     foreach ($seats['result'] as $seat) {
                         if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
@@ -99,6 +106,13 @@ class SaleController extends Controller
                     foreach ($seats['result'] as $seat) {
                         if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
                             array_push($newSeats, $seat);
+                        }
+                    }
+                }
+                foreach ($invitationTickets as $ticket) {
+                    foreach ($seats['result'] as $seat) {
+                        if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
+                            array_push($invitationSeats, $seat);
                         }
                     }
                 }
@@ -146,6 +160,20 @@ class SaleController extends Controller
                         if (Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one()){
                             Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one()->delete();
                         }
+                    }
+                }
+
+                if (!empty($invitationSeats)) {
+//                    var_dump($invitationSeats);die();
+                    foreach ($invitationSeats as $invitationSeat) {
+                        $seat = Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $invitationSeat['svgSeatId']])->one();
+                        if ($seat)
+                        {
+                            if ($seat->comment === 'На продаже'){
+                                $seat->delete();
+                            }
+                        }
+
                     }
                 }
 

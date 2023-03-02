@@ -246,8 +246,11 @@ class SiteController extends Controller
         return $res;
     }
 
-    public function actionSold()
+    public function actionSold($ID = 'last')
     {
+        if ($ID === "last") {
+            $ID = Events::find()->orderBy(['id' => SORT_DESC])->one()->id;
+        }
         $events = Events::find()->all();
         foreach ($events as $event) {
             if ($event->session_id && ($event->is_active === 1)) {
@@ -262,9 +265,13 @@ class SiteController extends Controller
                 $soldTickets = [];
                 $rejectedTickets = [];
                 $newTickets = [];
+                $invitationTickets = [];
                 foreach ($tickets['result'] as $ticket) {
                     if(($ticket['ticketStatusName'] === "Проданный") && ($ticket['tarifName'] !== "Пригласительное место")) {
                         array_push($soldTickets, $ticket);
+                    }
+                    if(($ticket['ticketStatusName'] === "Проданный") && ($ticket['tarifName'] === "Пригласительное место")) {
+                        array_push($invitationTickets, $ticket);
                     }
                     if($ticket['ticketStatusName'] === "Возвратный") {
                         array_push($rejectedTickets, $ticket);
@@ -277,6 +284,7 @@ class SiteController extends Controller
                 $soldSeats = [];
                 $rejectedSeats = [];
                 $newSeats = [];
+                $invitationSeats = [];
                 foreach ($soldTickets as $ticket) {
                     foreach ($seats['result'] as $seat) {
                         if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
@@ -296,6 +304,13 @@ class SiteController extends Controller
                     foreach ($seats['result'] as $seat) {
                         if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
                             array_push($newSeats, $seat);
+                        }
+                    }
+                }
+                foreach ($invitationTickets as $ticket) {
+                    foreach ($seats['result'] as $seat) {
+                        if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
+                            array_push($invitationSeats, $seat);
                         }
                     }
                 }
@@ -346,9 +361,22 @@ class SiteController extends Controller
                     }
                 }
 
+                if (!empty($invitationSeats)) {
+                    foreach ($invitationSeats as $invitationSeat) {
+                        $seat = Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $invitationSeat['svgSeatId']])->one();
+                        if ($seat)
+                        {
+                            if ($seat->comment === 'На продаже'){
+                                $seat->delete();
+                            }
+                        }
+
+                    }
+                }
+
             }
         }
-        return "Sold tickets are recalculated. ExecutionTime: " . \Yii::getLogger()->getElapsedTime();
+        return $this->actionScheme($id = $ID);
     }
 
     public function actionDownload($id)

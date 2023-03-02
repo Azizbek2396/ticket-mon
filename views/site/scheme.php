@@ -43,6 +43,7 @@ $this->title = 'Рассадка';
             <div class="col-lg-2 mb-4"><?= Html::submitButton('Перейти', ['class' => 'btn btn-primary']) ?></div>
             <div class="col-lg-2 mb-4"><a href="?r=site/report" class="btn btn-success">СВОДНЫЙ ОТЧЁТ</a></div>
             <div class="col-lg-2 mb-4"><a href="?r=report" class="btn btn-success">ОТЧЁТ ПО ЕЭСБО</a></div>
+            <div class="col-lg-2 mb-4"><a href="<?= \yii\helpers\Url::toRoute(["site/sold",'ID'=>$id])?>" class="btn btn-success">SYNC</a></div>
         </div>
     <?php ActiveForm::end(); ?>
 
