@@ -273,10 +273,10 @@ class SiteController extends Controller
                     if(($ticket['ticketStatusName'] === "Проданный") && ($ticket['tarifName'] === "Пригласительное место")) {
                         array_push($invitationTickets, $ticket);
                     }
-                    if($ticket['ticketStatusName'] === "Возвратный") {
-                        array_push($rejectedTickets, $ticket);
-                    }
-                    if($ticket['ticketStatusName'] === "Новый") {
+//                    if($ticket['ticketStatusName'] === "Возвратный") {
+//                        array_push($rejectedTickets, $ticket);
+//                    }
+                    if($ticket['ticketStatusName'] === "Новый" || $ticket['ticketStatusName'] === "Возвратный") {
                         array_push($newTickets, $ticket);
                     }
                 }
@@ -353,13 +353,14 @@ class SiteController extends Controller
                         }
                     }
                 }
-                if (!empty($rejectedSeats)) {
-                    foreach ($rejectedSeats as $rejectedSeat) {
-                        if (Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one()){
-                            Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one()->delete();
-                        }
-                    }
-                }
+//                if (!empty($rejectedSeats)) {
+//                    foreach ($rejectedSeats as $rejectedSeat) {
+//                        $seat = Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one();
+//                        if ($seat){
+//                            $seat->delete();
+//                        }
+//                    }
+//                }
 
                 if (!empty($invitationSeats)) {
                     foreach ($invitationSeats as $invitationSeat) {
