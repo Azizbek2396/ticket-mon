@@ -59,7 +59,7 @@ use yii\widgets\ActiveForm;
             'attribute' => 'orgs',
             'data' => [],
             'options' => [
-                'placeholder' => 'Выберите тип',
+                'placeholder' => 'Выберите оргонизации',
                     'multiple' => true
             ],
             'pluginOptions' => [

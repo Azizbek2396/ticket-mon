@@ -9,7 +9,7 @@ class ReportController extends \yii\web\Controller
     public function actionIndex()
     {
 //        $this->actionAuth();
-        $types = ['Театр', 'Музей'];
+        $types = ['Театр', 'Музей', 'Концертные залы'];
 
         if ($this->request->isPost)
         {
@@ -210,6 +210,16 @@ class ReportController extends \yii\web\Controller
                     }
                 }
             }
+            if ($type == 2) {
+                $orgs = file_get_contents(dirname(__DIR__, 1) . '/web/json/palaces.json');
+                $orgs = json_decode($orgs, true);
+
+                foreach ($orgs["result"] as $org) {
+                    if ($org["id"] === $id){
+                        return $org["name"];
+                    }
+                }
+            }
 
         }
     }
@@ -231,6 +241,17 @@ class ReportController extends \yii\web\Controller
             }
             if ($id == 1) {
                 $orgs = file_get_contents(dirname(__DIR__, 1) . '/web/json/museums.json');
+                $orgs = json_decode($orgs, true);
+                if (count($orgs["result"]) > 0) {
+                    foreach ($orgs["result"] as $org) {
+                        echo "<option value='" . $org["id"] . "'>" . $org["name"] . "</option>";
+                    }
+                } else {
+                    echo "'<option>-</option>'";
+                }
+            }
+            if ($id == 2) {
+                $orgs = file_get_contents(dirname(__DIR__, 1) . '/web/json/palaces.json');
                 $orgs = json_decode($orgs, true);
                 if (count($orgs["result"]) > 0) {
                     foreach ($orgs["result"] as $org) {

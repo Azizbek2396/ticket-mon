@@ -50,7 +50,7 @@ class SaleController extends Controller
     }
 
 //  Crontab
-//  */1 * * * * /usr/bin/php /home/www/ticket-mon/yii hello/test >> /home/www/ticket-mon/test.log
+//  */1 * * * * /usr/bin/php /home/www/seating/yii hello/test >> /home/www/seating/test.log
     public function actionSold()
     {
         $events = Events::find()->all();

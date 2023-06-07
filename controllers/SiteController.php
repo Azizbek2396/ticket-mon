@@ -248,6 +248,7 @@ class SiteController extends Controller
 
     public function actionSold($ID = 'last')
     {
+        $this->actionAuth();
         if ($ID === "last") {
             $ID = Events::find()->orderBy(['id' => SORT_DESC])->one()->id;
         }
