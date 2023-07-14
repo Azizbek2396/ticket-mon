@@ -16,6 +16,7 @@ class ReportController extends \yii\web\Controller
 //            var_dump($this->request->post());die();
             set_time_limit(10 * 60);
             $this->actionAuth();
+//            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
             require('../vendor/PHPExcel/PHPExcel.php');
             $objPHPExcel = new \PHPExcel;
@@ -40,14 +41,20 @@ class ReportController extends \yii\web\Controller
             {
                 $i = 0;
                 $sum = 0;
+                $rejectCout = 0;
+                $rejectSum = 0;
                 $res = $this->getResponsePost($soldTicketsUrl, +$org, $startDate, $endDate);
                 $tickets = json_decode($res->getBody()->getContents(), true);
 
                 foreach ($tickets["result"]["data"] as $ticket)
                 {
+//                    return $ticket; die();
                     if (!$ticket["isReject"]) {
                         $i++;
-                        $sum += $ticket['ticketRealSum'];
+                        $sum += $ticket['ticketRealSum'] - $ticket['ticketPriviligesSum'];
+                    } else {
+                        $rejectCout++;
+                        $rejectSum += $ticket['ticketRealSum'];
                     }
                 }
 //                array_push($result, [
@@ -58,6 +65,8 @@ class ReportController extends \yii\web\Controller
                 $activeSheet->setCellValueExplicit('A'.$row, $this->getOrgName(+$org, $type), \PHPExcel_Cell_DataType::TYPE_STRING);
                 $activeSheet->setCellValueExplicit('B'.$row, $i, \PHPExcel_Cell_DataType::TYPE_NUMERIC);
                 $activeSheet->setCellValueExplicit('C'.$row, $sum, \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                $activeSheet->setCellValueExplicit('D'.$row, $rejectCout, \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                $activeSheet->setCellValueExplicit('E'.$row, $rejectSum, \PHPExcel_Cell_DataType::TYPE_NUMERIC);
                 $row++;
             }
 
