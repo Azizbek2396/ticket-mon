@@ -447,7 +447,7 @@ class SiteController extends Controller
         $activeSheet = $objPHPExcel->getActiveSheet();
         $row = 2;
 
-        $events = Events::find()->select(['event_id'])->distinct()->all();
+        $events = Events::find()->where(['is_active' => 1])->select(['event_id'])->distinct()->all();
 //        var_dump($events[0]["event_id"]);die();
 
         $url = "https://cabinet.cultureticket.uz/api/CultureTicket/Sessions/";
