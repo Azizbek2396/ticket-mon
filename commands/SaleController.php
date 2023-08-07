@@ -65,39 +65,27 @@ class SaleController extends Controller
                 $seats = json_decode($res2->getBody()->getContents(), true);
 
                 $soldTickets = [];
-                $rejectedTickets = [];
                 $newTickets = [];
                 $invitationTickets = [];
                 foreach ($tickets['result'] as $ticket) {
                     if(($ticket['ticketStatusName'] === "Проданный") && ($ticket['tarifName'] !== "Пригласительное место")) {
                         array_push($soldTickets, $ticket);
                     }
-                    if(($ticket['ticketStatusName'] === "Проданный") && ($ticket['tarifName'] === "Пригласительное место")) {
+                    if(($ticket['ticketStatusName'] !== "Проданный") && ($ticket['tarifName'] === "Пригласительное место")) {
                         array_push($invitationTickets, $ticket);
                     }
-//                    if($ticket['ticketStatusName'] === "Возвратный") {
-//                        array_push($rejectedTickets, $ticket);
-//                    }
                     if($ticket['ticketStatusName'] === "Новый" || $ticket['ticketStatusName'] === "Возвратный") {
                         array_push($newTickets, $ticket);
                     }
                 }
 
                 $soldSeats = [];
-                $rejectedSeats = [];
                 $newSeats = [];
                 $invitationSeats = [];
                 foreach ($soldTickets as $ticket) {
                     foreach ($seats['result'] as $seat) {
                         if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
                             array_push($soldSeats, $seat);
-                        }
-                    }
-                }
-                foreach ($rejectedTickets as $ticket) {
-                    foreach ($seats['result'] as $seat) {
-                        if(($seat['sectorName'] === $ticket['sectorName']) && ($seat['seatNumber'] === (int)$ticket['seatNumber']) && ($seat['rowNumber'] === (int)$ticket['rowNumber'])) {
-                            array_push($rejectedSeats, $seat);
                         }
                     }
                 }
@@ -155,14 +143,6 @@ class SaleController extends Controller
                         }
                     }
                 }
-//                if (!empty($rejectedSeats)) {
-//                    foreach ($rejectedSeats as $rejectedSeat) {
-//                        $seat = Saver::find()->where(['event_id' => $event->id, 'seat_id' => 'seat-' . $rejectedSeat['svgSeatId']])->one();
-//                        if ($seat){
-//                            $seat->delete();
-//                        }
-//                    }
-//                }
 
                 if (!empty($invitationSeats)) {
                     foreach ($invitationSeats as $invitationSeat) {
