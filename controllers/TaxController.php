@@ -52,6 +52,7 @@ class TaxController extends \yii\web\Controller
 
     public function actionGetCommitent($tin)
     {
+        $this->actionAuth();
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $url = "https://api.ofd.uz/emr-api/catalog/commitent/list/" . $tin;
         $res = $this->getResponse($url);
@@ -62,6 +63,7 @@ class TaxController extends \yii\web\Controller
 
     public function actionReportCommitent($tin)
     {
+        $this->actionAuth();
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $url = "https://api.ofd.uz/emr-api/catalog/commitent/list/" . $tin;
         $res = $this->getResponse($url);
